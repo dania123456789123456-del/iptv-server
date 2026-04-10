@@ -764,7 +764,16 @@ let epNum = String(i.episodio).padStart(3,"0")
 
 let nombreFinal = `Episodio ${epNum}`
 
-if(i.capitulo && i.capitulo.trim() !== "" && i.capitulo !== "Capítulo"){
+let cap = (i.capitulo || "").trim().toLowerCase()
+
+// ❌ detectar nombres basura
+let esGenerico = 
+cap === "" ||
+cap === "capítulo" ||
+cap === "episodio" ||
+cap.includes("episodio")
+
+if(!esGenerico){
 nombreFinal += ` - ${i.capitulo}`
 }
 
