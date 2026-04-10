@@ -729,50 +729,49 @@ return a.episodio-b.episodio
 })
 
 let ultimaSerie = ""
-let ultimaTemporada = ""
 
 base.forEach(i=>{
 
 let esPelicula = i.temporada===1 && i.episodio===1 && i.capitulo===i.titulo
 
-// 🔥 DETECTAR CAMBIO DE SERIE O TEMPORADA
-if(!esPelicula){
-
-let tempFormateada = String(i.temporada).padStart(2,"0")
-
-if(i.titulo !== ultimaSerie || i.temporada !== ultimaTemporada){
-
-lista += `# ===== ${i.titulo} =====\n`
-lista += `# ===== TEMPORADA ${tempFormateada} =====\n\n`
-
-ultimaSerie = i.titulo
-ultimaTemporada = i.temporada
-
-}
-
-}
-
-let nombre
-let grupo
-
+// 🎬 PELICULAS (NO CAMBIAMOS TU LÓGICA)
 if(esPelicula){
 
-nombre = i.titulo
-grupo = "PELICULAS"
+let nombre = i.titulo.replace(/,/g,"")
 
-}else{
+lista+=`#EXTINF:-1 tvg-logo="https://image.tmdb.org/t/p/w500${i.poster}" group-title="PELICULAS",${nombre}\n`
+lista+=`${i.link}\n\n`
 
-let tempFormateada = String(i.temporada).padStart(2,"0")
+return
+}
 
-nombre = `TEMPORADA ${tempFormateada} "Episodio ${i.episodio}"`
-grupo = `${i.titulo}`
+// 🔥 SEPARADOR DE SERIE (SOLO 1 VEZ)
+if(i.titulo !== ultimaSerie){
+
+lista += `#EXTINF:-1 group-title="══════ • ${i.titulo.toUpperCase()} •",${i.titulo.toUpperCase()}\n`
+lista += `http://dummy.url/blank\n\n`
+
+ultimaSerie = i.titulo
 
 }
 
-let nombreLimpio = nombre.replace(/,/g,"")
+// 📺 GROUP TITLE (TEMPORADA)
+let tempFormateada = String(i.temporada).padStart(2,"0")
+let grupo = `${i.titulo.toUpperCase()} - T${tempFormateada}`
 
-lista+=`#EXTINF:-1 tvg-logo="https://image.tmdb.org/t/p/w500${i.poster}" group-title="${grupo}",${nombreLimpio}\n`
+// 🎬 EPISODIO PRO
+let epNum = String(i.episodio).padStart(3,"0")
 
+let nombreFinal = `Episodio ${epNum}`
+
+if(i.capitulo && i.capitulo.trim() !== "" && i.capitulo !== "Capítulo"){
+nombreFinal += ` - ${i.capitulo}`
+}
+
+// limpiar comas
+nombreFinal = nombreFinal.replace(/,/g,"")
+
+lista+=`#EXTINF:-1 tvg-logo="https://image.tmdb.org/t/p/w500${i.poster}" group-title="${grupo}",${nombreFinal}\n`
 lista+=`${i.link}\n\n`
 
 })
